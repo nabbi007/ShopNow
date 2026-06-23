@@ -8,6 +8,8 @@ from app.models.order import Order, OrderItem
 from app.models.product import Product
 from app.schemas.order import OrderCreate, OrderResponse
 from app.dependencies import get_redis
+from app.auth import get_current_user
+from app.models.user import User
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -17,6 +19,7 @@ async def place_order(
     payload: OrderCreate,
     db: AsyncSession = Depends(get_db),
     redis: Redis = Depends(get_redis),
+    current_user: User = Depends(get_current_user),
 ):
     raw = await redis.get(f"cart:{payload.session_id}")
     if not raw:
@@ -70,6 +73,20 @@ async def place_order(
 @router.get("/", response_model=list[OrderResponse])
 async def list_orders(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Order))
+    return result.scalars().all()
+
+
+# NOTE: declared before "/{order_id}" so "me" isn't matched as an int path param.
+@router.get("/me", response_model=list[OrderResponse])
+async def my_orders(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(Order)
+        .where(Order.customer_email == current_user.email)
+        .order_by(Order.id.desc())
+    )
     return result.scalars().all()
 
 

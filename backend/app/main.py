@@ -5,8 +5,8 @@ from sqlalchemy import text
 
 from app.config import settings
 from app.database import engine, Base
-from app.models import Product, Order, OrderItem  
-from app.routes import products, cart, orders
+from app.models import Product, Order, OrderItem, User
+from app.routes import products, cart, orders, auth
 
 
 @asynccontextmanager
@@ -35,6 +35,7 @@ app.add_middleware(
 app.include_router(products.router, prefix="/api")
 app.include_router(cart.router, prefix="/api")
 app.include_router(orders.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
 
 
 @app.get("/health")

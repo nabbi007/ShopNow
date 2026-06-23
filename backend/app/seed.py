@@ -10,7 +10,7 @@ SAMPLE_PRODUCTS = [
         "price": 149.99,
         "stock": 50,
         "category": "Electronics",
-        "image_url": "https://placehold.co/400x400?text=Headphones",
+        "image_url": "/headphones.jpeg",
     },
     {
         "name": "Mechanical Keyboard",
@@ -18,7 +18,7 @@ SAMPLE_PRODUCTS = [
         "price": 89.99,
         "stock": 30,
         "category": "Electronics",
-        "image_url": "https://placehold.co/400x400?text=Keyboard",
+        "image_url": "/keyboard.jpeg",
     },
     {
         "name": "Running Shoes",
@@ -26,7 +26,7 @@ SAMPLE_PRODUCTS = [
         "price": 74.99,
         "stock": 100,
         "category": "Footwear",
-        "image_url": "https://placehold.co/400x400?text=Shoes",
+        "image_url": "/shoes.jpeg",
     },
     {
         "name": "Stainless Steel Water Bottle",
@@ -34,7 +34,7 @@ SAMPLE_PRODUCTS = [
         "price": 24.99,
         "stock": 200,
         "category": "Sports",
-        "image_url": "https://placehold.co/400x400?text=Bottle",
+        "image_url": "/flask.jpeg",
     },
     {
         "name": "Yoga Mat",
@@ -42,7 +42,7 @@ SAMPLE_PRODUCTS = [
         "price": 34.99,
         "stock": 80,
         "category": "Sports",
-        "image_url": "https://placehold.co/400x400?text=Yoga+Mat",
+        "image_url": "/yogamat.jpeg",
     },
     {
         "name": "Desk Lamp",
@@ -50,7 +50,7 @@ SAMPLE_PRODUCTS = [
         "price": 39.99,
         "stock": 60,
         "category": "Home",
-        "image_url": "https://placehold.co/400x400?text=Lamp",
+        "image_url": "/lamp.jpeg",
     },
 ]
 
