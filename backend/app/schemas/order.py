@@ -1,5 +1,4 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
+from pydantic import BaseModel
 from app.models.order import OrderStatus
 
 
@@ -19,8 +18,8 @@ class OrderItemResponse(BaseModel):
 
 
 class OrderCreate(BaseModel):
-    customer_name: str
-    customer_email: EmailStr
+    # customer_name/email are intentionally NOT accepted from the client; the
+    # server derives them from the authenticated user (see routes/orders.py).
     shipping_address: str
     session_id: str
 

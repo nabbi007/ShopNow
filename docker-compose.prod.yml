@@ -1,0 +1,25 @@
+# Production-style overrides. Layer on top of the base file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Differences from local dev:
+#   - no --reload and no source bind-mount (image is immutable)
+#   - multiple uvicorn workers
+#   - services always restart
+services:
+  backend:
+    # Drop the dev bind-mount: run the code baked into the image.
+    volumes: []
+    restart: always
+    environment:
+      ENVIRONMENT: production
+    # Multiple workers; no --reload. Tune worker count to available CPU.
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+  frontend:
+    restart: always
+
+  db:
+    restart: always
+
+  redis:
+    restart: always

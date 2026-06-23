@@ -3,7 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
 from app.models.product import Product
+from app.models.user import User
 from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
+from app.auth import require_admin
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -29,7 +31,11 @@ async def get_product(product_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
-async def create_product(payload: ProductCreate, db: AsyncSession = Depends(get_db)):
+async def create_product(
+    payload: ProductCreate,
+    db: AsyncSession = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
     product = Product(**payload.model_dump())
     db.add(product)
     await db.commit()
@@ -42,6 +48,7 @@ async def update_product(
     product_id: int,
     payload: ProductUpdate,
     db: AsyncSession = Depends(get_db),
+    _admin: User = Depends(require_admin),
 ):
     product = await db.get(Product, product_id)
     if not product:
@@ -54,7 +61,11 @@ async def update_product(
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_product(product_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_product(
+    product_id: int,
+    db: AsyncSession = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
     product = await db.get(Product, product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")

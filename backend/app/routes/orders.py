@@ -1,4 +1,5 @@
 import json
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -8,10 +9,12 @@ from app.models.order import Order, OrderItem
 from app.models.product import Product
 from app.schemas.order import OrderCreate, OrderResponse
 from app.dependencies import get_redis
-from app.auth import get_current_user
+from app.auth import get_current_user, require_admin
 from app.models.user import User
 
 router = APIRouter(prefix="/orders", tags=["orders"])
+
+logger = logging.getLogger("shopnow.orders")
 
 
 @router.post("/", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
@@ -54,9 +57,11 @@ async def place_order(
             )
         )
 
+    # Identity is taken from the authenticated user, never from the request
+    # body, so a client cannot place an order on someone else's behalf.
     order = Order(
-        customer_name=payload.customer_name,
-        customer_email=payload.customer_email,
+        customer_name=current_user.name,
+        customer_email=current_user.email,
         shipping_address=payload.shipping_address,
         total_amount=round(total, 2),
         items=order_items,
@@ -67,11 +72,19 @@ async def place_order(
 
     await redis.delete(f"cart:{payload.session_id}")
 
+    logger.info(
+        "Order %s placed by user_id=%s total=%.2f items=%d",
+        order.id, current_user.id, order.total_amount, len(order_items),
+    )
     return order
 
 
 @router.get("/", response_model=list[OrderResponse])
-async def list_orders(db: AsyncSession = Depends(get_db)):
+async def list_orders(
+    db: AsyncSession = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Admin-only: list every order. Customers use GET /orders/me."""
     result = await db.execute(select(Order))
     return result.scalars().all()
 
@@ -91,8 +104,16 @@ async def my_orders(
 
 
 @router.get("/{order_id}", response_model=OrderResponse)
-async def get_order(order_id: int, db: AsyncSession = Depends(get_db)):
+async def get_order(
+    order_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     order = await db.get(Order, order_id)
     if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    # Owners (matched by email) and admins may read an order; everyone else
+    # gets 404 so order IDs can't be probed for existence.
+    if order.customer_email != current_user.email and current_user.role != "admin":
         raise HTTPException(status_code=404, detail="Order not found")
     return order

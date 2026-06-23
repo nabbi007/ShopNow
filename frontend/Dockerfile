@@ -10,8 +10,6 @@ RUN npm ci
 COPY . .
 
 # API base URL baked into the build. Defaults to the relative "/api" path so the
-# browser calls the frontend's own origin and nginx proxies it to the backend
-# (no CORS, works the same in compose / ECS / EKS).
 ARG REACT_APP_API_URL=/api
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 RUN npm run build

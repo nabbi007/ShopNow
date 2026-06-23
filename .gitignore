@@ -1,0 +1,44 @@
+# --- Secrets / environment ---
+# Never commit real env files; commit *.env.example templates instead.
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# --- Node ---
+node_modules/
+dist/
+build/
+.npm/
+*.tsbuildinfo
+
+# --- Terraform ---
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+override.tf
+override.tf.json
+# Keep .terraform.lock.hcl committed (do NOT ignore it).
+
+# --- Docker / logs ---
+*.log
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

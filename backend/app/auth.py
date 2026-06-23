@@ -11,7 +11,7 @@ from app.database import get_db
 from app.models.user import User
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 bearer_scheme = HTTPBearer(auto_error=True)
 
@@ -56,3 +56,13 @@ async def get_current_user(
     if not user:
         raise invalid
     return user
+
+
+async def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Dependency that allows only users with the 'admin' role."""
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+    return current_user

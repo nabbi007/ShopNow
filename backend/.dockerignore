@@ -1,0 +1,17 @@
+# Keep the build context small and free of secrets/cruft.
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+Dockerfile
+.dockerignore
+*.log
+README.md

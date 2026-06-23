@@ -12,3 +12,8 @@ class User(Base):
         String(200), unique=True, index=True, nullable=False
     )
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    # "customer" (default) or "admin". Gates product-catalog mutations and the
+    # admin-only order listing. See app.auth.require_admin.
+    role: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="customer", server_default="customer"
+    )
