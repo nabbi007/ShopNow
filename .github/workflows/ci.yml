@@ -255,7 +255,7 @@ jobs:
 
       # --- Reports (exit-code 0: produce files, never fail here) ---------------
       - name: Trivy report (table)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}
           format: table
@@ -264,7 +264,7 @@ jobs:
           exit-code: '0'
 
       - name: Trivy report (SARIF)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}
           format: sarif
@@ -303,7 +303,7 @@ jobs:
       # --- Gate (last, so reports above are always saved) ----------------------
       # ignore-unfixed: only fail on vulnerabilities that have a fix available.
       - name: Trivy gate (fail on fixable CRITICAL/HIGH)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.IMAGE }}
           format: table
