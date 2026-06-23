@@ -8,7 +8,10 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from app.config import settings
 from app.database import engine, Base
-from app.models import Product, Order, OrderItem, User
+
+# Imported for their side effect: registering the ORM models on Base.metadata
+# so the lifespan's create_all() sees every table.
+from app.models import Product, Order, OrderItem, User  # noqa: F401
 from app.rate_limit import limiter
 from app.routes import products, cart, orders, auth
 
