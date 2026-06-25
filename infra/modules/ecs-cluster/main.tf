@@ -93,6 +93,17 @@ resource "aws_security_group_rule" "services_self" {
   self              = true
 }
 
+# Let the ALB reach the backend directly (ALB routes /api/* -> backend TG).
+resource "aws_security_group_rule" "backend_from_alb" {
+  type                     = "ingress"
+  description              = "Backend port from ALB"
+  from_port                = var.backend_container_port
+  to_port                  = var.backend_container_port
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.services.id
+  source_security_group_id = aws_security_group.alb.id
+}
+
 # --- Application Load Balancer ----------------------------------------------
 resource "aws_lb" "this" {
   name               = "${var.project_name}-alb"
@@ -119,14 +130,55 @@ resource "aws_lb_target_group" "frontend" {
   }
 }
 
+# One target group per backend microservice (Fargate IP targets).
+resource "aws_lb_target_group" "backend" {
+  for_each = var.backend_services
+
+  name        = "${var.project_name}-${each.key}-tg"
+  port        = var.backend_container_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = each.value.health_check_path
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    matcher             = "200"
+  }
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
 
+  # Default: serve the SPA from the frontend.
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+# One listener rule per service: path_pattern -> that service's target group.
+# (Bypasses the frontend nginx and Cloud Map for north-south /api traffic.)
+resource "aws_lb_listener_rule" "backend" {
+  for_each = var.backend_services
+
+  listener_arn = aws_lb_listener.http.arn
+  priority     = each.value.priority
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend[each.key].arn
+  }
+
+  condition {
+    path_pattern {
+      values = [each.value.path_pattern]
+    }
   }
 }
 

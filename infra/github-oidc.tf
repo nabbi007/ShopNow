@@ -1,16 +1,5 @@
 # ---------------------------------------------------------------------------
 # GitHub Actions OIDC deploy role.
-#
-# Lets the CI/CD workflows assume an AWS role via OIDC (short-lived tokens) so
-# no long-lived AWS access keys live in GitHub secrets. Put the output
-# `github_actions_role_arn` into the repo's AWS_DEPLOY_ROLE_ARN secret.
-#
-# Apply this once locally (terraform apply) to create the role BEFORE the CD
-# pipeline can use it. If the account already has the GitHub OIDC provider,
-# import it instead of creating a duplicate:
-#   terraform import aws_iam_openid_connect_provider.github \
-#     arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com
-# ---------------------------------------------------------------------------
 
 variable "github_repo" {
   description = "GitHub repository (owner/name) allowed to assume the deploy role"
@@ -56,11 +45,6 @@ resource "aws_iam_role" "gha_deploy" {
   max_session_duration = 3600
 }
 
-# Lab scope: the CD job runs a full `terraform apply` (manages IAM, VPC, RDS,
-# ECS, ECR, ...) plus image pushes, which effectively needs broad access.
-# AdministratorAccess keeps the lab simple; for production, replace this with a
-# least-privilege policy covering only ECR + ECS + the managed resources and
-# the state bucket.
 resource "aws_iam_role_policy_attachment" "gha_admin" {
   role       = aws_iam_role.gha_deploy.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
@@ -69,4 +53,24 @@ resource "aws_iam_role_policy_attachment" "gha_admin" {
 output "github_actions_role_arn" {
   description = "Set this as the GitHub AWS_DEPLOY_ROLE_ARN secret"
   value       = aws_iam_role.gha_deploy.arn
+}
+
+# Grant the CI/CD deploy role kubectl access to the EKS cluster (so the CD
+# pipeline can roll out the services). Cluster-admin scope for the lab.
+resource "aws_eks_access_entry" "gha_deploy" {
+  cluster_name  = module.eks.cluster_name
+  principal_arn = aws_iam_role.gha_deploy.arn
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "gha_deploy_admin" {
+  cluster_name  = module.eks.cluster_name
+  principal_arn = aws_iam_role.gha_deploy.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.gha_deploy]
 }
