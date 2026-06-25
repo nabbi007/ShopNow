@@ -1,0 +1,103 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="shopnow-eks" name="ShopNow on EKS">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="ShopNow — Amazon EKS" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="360" y="10" width="420" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Users + Internet -->
+        <mxCell id="users" value="Users" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3E;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.users;" vertex="1" parent="1">
+          <mxGeometry x="540" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="igw" value="Internet Gateway" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.internet_gateway;" vertex="1" parent="1">
+          <mxGeometry x="540" y="150" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="alb" value="Application Load Balancer&#10;shopnow-alb  (:8080 listener — SHARED with ECS)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.application_load_balancer;" vertex="1" parent="1">
+          <mxGeometry x="535" y="250" width="70" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- LB Controller note -->
+        <mxCell id="lbc" value="AWS Load Balancer Controller&#10;(TargetGroupBinding → registers pod IPs into the ALB target groups)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="760" y="250" width="300" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- VPC -->
+        <mxCell id="vpc" value="VPC 10.0.0.0/16  (same VPC as ECS)" style="outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;container=0;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;strokeColor=#8C4FFF;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#AAB7B8;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="1080" height="500" as="geometry" />
+        </mxCell>
+
+        <!-- EKS cluster group -->
+        <mxCell id="ekscluster" value="EKS Cluster (shopnow-eks, v1.31) — managed node group 2× t3.medium, private subnets" style="outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=11;container=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;strokeColor=#00A4A6;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#147EBA;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="90" y="430" width="740" height="390" as="geometry" />
+        </mxCell>
+
+        <!-- EKS + nodes icons -->
+        <mxCell id="eks" value="EKS control plane" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_kubernetes_service;" vertex="1" parent="1">
+          <mxGeometry x="110" y="450" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="node1" value="EC2 node" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="450" width="46" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="node2" value="EC2 node" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;" vertex="1" parent="1">
+          <mxGeometry x="760" y="450" width="46" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Pods (rounded rects, k8s blue) -->
+        <mxCell id="frontend" value="frontend&#10;Deployment ×2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2FD;strokeColor=#147EBA;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="540" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth" value="auth ×2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2FD;strokeColor=#147EBA;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="540" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="catalog" value="catalog ×2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2FD;strokeColor=#147EBA;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="540" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cart" value="cart ×2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2FD;strokeColor=#147EBA;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="500" y="540" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="order" value="order ×2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAF2FD;strokeColor=#147EBA;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="540" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="redis (pod)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8E8FB;strokeColor=#C925D1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="500" y="700" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="coredns" value="CoreDNS&#10;(service discovery: &lt;svc&gt;.shopnow.svc)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F4EA;strokeColor=#00A4A6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="130" y="700" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ECR + RDS (shared) -->
+        <mxCell id="ecr" value="ECR&#10;same 5 images" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_container_registry;" vertex="1" parent="1">
+          <mxGeometry x="920" y="470" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="rds" value="RDS PostgreSQL (SHARED)&#10;auth / catalog / orders DBs" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds;" vertex="1" parent="1">
+          <mxGeometry x="915" y="650" width="70" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Edges: ingress -->
+        <mxCell id="e1" style="endArrow=block;html=1;strokeColor=#232F3E;" edge="1" parent="1" source="users" target="igw"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="endArrow=block;html=1;strokeColor=#232F3E;" edge="1" parent="1" source="igw" target="alb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="elbc" value="manages" style="endArrow=open;html=1;dashed=1;strokeColor=#D6B656;fontSize=9;" edge="1" parent="1" source="lbc" target="alb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" value="/" style="endArrow=block;html=1;strokeColor=#8C4FFF;fontSize=9;" edge="1" parent="1" source="alb" target="frontend"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" value="/api/auth/*" style="endArrow=block;html=1;strokeColor=#8C4FFF;fontSize=9;" edge="1" parent="1" source="alb" target="auth"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="/api/products/*" style="endArrow=block;html=1;strokeColor=#8C4FFF;fontSize=9;" edge="1" parent="1" source="alb" target="catalog"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="/api/cart/*" style="endArrow=block;html=1;strokeColor=#8C4FFF;fontSize=9;" edge="1" parent="1" source="alb" target="cart"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="/api/orders/*" style="endArrow=block;html=1;strokeColor=#8C4FFF;fontSize=9;" edge="1" parent="1" source="alb" target="order"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Edges: internal (CoreDNS) -->
+        <mxCell id="e8" value="catalog" style="endArrow=open;html=1;dashed=1;strokeColor=#00A4A6;fontSize=9;" edge="1" parent="1" source="cart" target="catalog"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" value="catalog/cart" style="endArrow=open;html=1;dashed=1;strokeColor=#00A4A6;fontSize=9;" edge="1" parent="1" source="order" target="cart"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" style="endArrow=open;html=1;dashed=1;strokeColor=#00A4A6;" edge="1" parent="1" source="cart" target="redis"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Edges: data + images -->
+        <mxCell id="e11" value="5432" style="endArrow=block;html=1;strokeColor=#C925D1;fontSize=9;" edge="1" parent="1" source="catalog" target="rds"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e12" style="endArrow=block;html=1;strokeColor=#C925D1;" edge="1" parent="1" source="auth" target="rds"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" style="endArrow=block;html=1;strokeColor=#C925D1;" edge="1" parent="1" source="order" target="rds"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e14" value="image pull" style="endArrow=open;html=1;dashed=1;strokeColor=#ED7100;fontSize=9;" edge="1" parent="1" source="ecr" target="catalog"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
