@@ -1,0 +1,14 @@
+# Non-secret config shared by the services. Secrets (per-service DATABASE_URL,
+# SECRET_KEY) are created separately via kubectl — see README.md.
+# Unknown env vars are ignored by each service, so one ConfigMap is fine for all.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shopnow-config
+  namespace: shopnow
+data:
+  # Service discovery via CoreDNS (<service>.<namespace>; same namespace = short name).
+  REDIS_URL: "redis://redis:6379"
+  CATALOG_URL: "http://catalog:8000"
+  CART_URL: "http://cart:8000"
+  CORS_ORIGINS: '["*"]'
