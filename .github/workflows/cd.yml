@@ -35,12 +35,11 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - name: backend
-            repo: shopnow-backend
-            context: backend
-          - name: frontend
-            repo: shopnow-frontend
-            context: frontend
+          - { name: auth, repo: shopnow-auth, context: services, dockerfile: services/auth/Dockerfile }
+          - { name: catalog, repo: shopnow-catalog, context: services, dockerfile: services/catalog/Dockerfile }
+          - { name: cart, repo: shopnow-cart, context: services, dockerfile: services/cart/Dockerfile }
+          - { name: order, repo: shopnow-order, context: services, dockerfile: services/order/Dockerfile }
+          - { name: frontend, repo: shopnow-frontend, context: frontend, dockerfile: frontend/Dockerfile }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,6 +60,7 @@ jobs:
         run: |
           IMG="$REGISTRY/${{ matrix.repo }}"
           docker build \
+            -f "${{ matrix.dockerfile }}" \
             ${{ matrix.name == 'frontend' && '--build-arg REACT_APP_API_URL=/api' || '' }} \
             -t "$IMG:${GITHUB_SHA}" \
             -t "$IMG:latest" \
@@ -87,15 +87,32 @@ jobs:
         with:
           terraform_version: 1.14.1
 
-      - name: Terraform apply
+      - name: Terraform apply (ECS deploy)
         working-directory: infra
         env:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_secret_key: ${{ secrets.SECRET_KEY }}
         run: |
           terraform init
-          terraform apply -auto-approve -var="image_tag=${GITHUB_SHA}"
+#          terraform apply -auto-approve -var="image_tag=${GITHUB_SHA}"
 
-      - name: Output app URL
+      - name: Deploy to EKS (roll each service to the new image)
+        run: |
+          ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+          REG="$ACCOUNT.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          aws eks update-kubeconfig --region "$AWS_REGION" --name shopnow-eks
+          for s in auth catalog cart order frontend; do
+            kubectl -n shopnow set image "deployment/$s" "$s=$REG/shopnow-$s:${GITHUB_SHA}"
+          done
+          kubectl -n shopnow rollout status \
+            deployment/auth deployment/catalog deployment/cart deployment/order deployment/frontend \
+            --timeout=180s
+
+      - name: Output app URLs
         working-directory: infra
-        run: terraform output -raw alb_url >> "$GITHUB_STEP_SUMMARY" || true
+        run: |
+          {
+            echo "### Deployed"
+            echo "- ECS: $(terraform output -raw alb_url)"
+            echo "- EKS: $(terraform output -raw eks_alb_url)"
+          } >> "$GITHUB_STEP_SUMMARY" || true
