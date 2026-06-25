@@ -13,7 +13,8 @@ from app.models.product import Product
 from app.models.user import User
 from app.auth import hash_password
 
-ADMIN_EMAIL = os.getenv("SEED_ADMIN_EMAIL", "admin@shopnow.local")
+# Real TLD (not .local) — email-validator rejects reserved domains at login.
+ADMIN_EMAIL = os.getenv("SEED_ADMIN_EMAIL", "admin@shopnow.com")
 ADMIN_PASSWORD = os.getenv("SEED_ADMIN_PASSWORD", "Admin123!")
 ADMIN_NAME = os.getenv("SEED_ADMIN_NAME", "ShopNow Admin")
 

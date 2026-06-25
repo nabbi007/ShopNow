@@ -3,17 +3,16 @@ server {
     server_name _;
     server_tokens off;
 
-    resolver 169.254.169.253 valid=10s ipv6=off;
-
     # Security headers applied to every response ("always" covers errors too).
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "DENY" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;.
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # font-src + style-src include fonts.cdnfonts.com so the Batica Sans webfont
+    # (CSS + font files) can load; everything else stays same-origin.
     add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.cdnfonts.com; font-src 'self' https://fonts.cdnfonts.com; script-src 'self'; connect-src 'self'" always;
 
     location /api/ {
-        set $backend_upstream ${BACKEND_HOST};
-        proxy_pass http://$backend_upstream$request_uri;
+        proxy_pass http://${BACKEND_HOST}/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

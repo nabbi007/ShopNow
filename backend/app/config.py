@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -18,8 +18,10 @@ class Settings(BaseSettings):
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
 
-    class Config:
-        env_file = ".env"
+    # extra="ignore": the project-root .env is shared with docker-compose and
+    # defines vars meant for other services (POSTGRES_*, BACKEND_HOST). Ignore
+    # any env var we don't declare instead of failing to start.
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 settings = Settings()

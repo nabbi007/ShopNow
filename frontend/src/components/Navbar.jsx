@@ -94,7 +94,7 @@ export default function Navbar() {
     <nav className="border-b border-gray-100 bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
         <Link to="/" className="text-2xl font-bold tracking-tight text-gray-900">
-          Flone<span className="text-rose-500">.</span>
+          Shop<span className="text-rose-500">Now</span>
         </Link>
         <ul className="hidden items-center gap-8 text-sm font-medium text-gray-700 lg:flex">
           {LINKS.map((l) => {
